@@ -40,8 +40,11 @@ def get_main_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        text="📚 *Глоссарий Leanwave*\n\nВыберите термин:",
+    # Отправляем фото с подписью и клавиатурой
+    # Убедитесь, что файл glossary.jpg загружен в корень репозитория
+    await update.message.reply_photo(
+        photo=open("glossary.jpg", "rb"),
+        caption="📚 *Lean Глоссарий ООУ*\n\nВыберите термин:",
         reply_markup=get_main_keyboard(),
         parse_mode="Markdown"
     )
@@ -52,7 +55,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = query.data
     if data == "to_glossary":
         await query.edit_message_text(
-            text="📚 *Глоссарий Leanwave*\n\nВыберите термин:",
+            text="📚 *Lean Глоссарий ООУ*\n\nВыберите термин:",
             reply_markup=get_main_keyboard(),
             parse_mode="Markdown"
         )
@@ -68,7 +71,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 def main():
-    TOKEN = os.environ.get("TOKEN")  # берём токен из переменных окружения на Bothost
+    TOKEN = os.environ.get("TOKEN")
     if not TOKEN:
         raise ValueError("Токен не найден! Установите переменную TOKEN на Bothost.")
     app = Application.builder().token(TOKEN).build()
