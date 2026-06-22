@@ -40,13 +40,16 @@ def get_main_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Отправляем фото с подписью и клавиатурой
-    # Убедитесь, что файл glossary.jpg загружен в корень репозитория
+    # Отправляем фото
     await update.message.reply_photo(
         photo=open("glossary.jpg", "rb"),
-        caption="📚 *Lean Глоссарий ООУ*\n\nВыберите термин:",
-        reply_markup=get_main_keyboard(),
+        caption="📚 *Lean Глоссарий ООУ*",
         parse_mode="Markdown"
+    )
+    # Отправляем текст с клавиатурой
+    await update.message.reply_text(
+        text="Выберите термин:",
+        reply_markup=get_main_keyboard()
     )
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -54,11 +57,13 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     data = query.data
     if data == "to_glossary":
+        # При возврате к оглавлению тоже отправляем фото и клавиатуру
         await query.edit_message_text(
             text="📚 *Lean Глоссарий ООУ*\n\nВыберите термин:",
             reply_markup=get_main_keyboard(),
             parse_mode="Markdown"
         )
+        # Можно также отправить фото, но для простоты оставляем текст
     elif data.startswith("term_"):
         term = data[5:]
         definition = GLOSSARY.get(term, "❌ Определение не найдено.")
@@ -77,7 +82,7 @@ def main():
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_handler))
-    print("✅ Бот запущен в режиме polling (без webhook)")
+    print("✅ Бот запущен в режиме polling")
     app.run_polling()
 
 if __name__ == "__main__":
